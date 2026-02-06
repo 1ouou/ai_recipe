@@ -3,5 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Export the app for Vercel Serverless Function
-export default app;
+// Vercel handles the request/response, so we need to export the handler
+export default async function handler(req: any, res: any) {
+  // Ensure we await the app processing
+  return app(req, res);
+}

@@ -340,7 +340,7 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
   useEffect(() => {
     const fetchIngredients = async () => {

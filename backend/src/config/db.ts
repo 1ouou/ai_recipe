@@ -104,6 +104,103 @@ export const initDB = async () => {
     `);
     console.log('Table ingredients checked/created.');
 
+    // 5. Seed Initial Ingredients if empty
+    const [rows]: any = await pool.query('SELECT COUNT(*) as count FROM ingredients');
+    const count = rows[0].count;
+
+    if (count === 0) {
+      console.log('Seeding ingredients table...');
+      // Initial Seed Data
+      const INGREDIENTS_SEED = [
+        // 🥬 蔬菜类
+        { name: '番茄', emoji: '🍅', category: 'vegetable' },
+        { name: '土豆', emoji: '🥔', category: 'vegetable' },
+        { name: '胡萝卜', emoji: '🥕', category: 'vegetable' },
+        { name: '洋葱', emoji: '🧅', category: 'vegetable' },
+        { name: '大蒜', emoji: '🧄', category: 'vegetable' },
+        { name: '西兰花', emoji: '🥦', category: 'vegetable' },
+        { name: '卷心菜', emoji: '🥬', category: 'vegetable' },
+        { name: '蘑菇', emoji: '🍄', category: 'vegetable' },
+        { name: '茄子', emoji: '🍆', category: 'vegetable' },
+        { name: '黄瓜', emoji: '🥒', category: 'vegetable' },
+        { name: '青椒', emoji: '🫑', category: 'vegetable' },
+        { name: '辣椒', emoji: '🌶️', category: 'vegetable' },
+        { name: '菠菜', emoji: '🌿', category: 'vegetable' },
+        { name: '生菜', emoji: '🥬', category: 'vegetable' },
+        { name: '南瓜', emoji: '🎃', category: 'vegetable' },
+        { name: '玉米', emoji: '🌽', category: 'vegetable' },
+        { name: '红薯', emoji: '🍠', category: 'vegetable' },
+        { name: '生姜', emoji: '🫚', category: 'vegetable' },
+        { name: '莲藕', emoji: '🪷', category: 'vegetable' },
+        { name: '竹笋', emoji: '🎋', category: 'vegetable' },
+        { name: '冬瓜', emoji: '🍈', category: 'vegetable' },
+
+        // 🥩 肉类
+        { name: '猪肉', emoji: '🥓', category: 'meat' },
+        { name: '牛肉', emoji: '🥩', category: 'meat' },
+        { name: '鸡肉', emoji: '🍗', category: 'meat' },
+        { name: '羊肉', emoji: '🍖', category: 'meat' },
+        { name: '香肠', emoji: '🌭', category: 'meat' },
+        { name: '培根', emoji: '🥓', category: 'meat' },
+        { name: '火腿', emoji: '🍖', category: 'meat' },
+        { name: '鸭肉', emoji: '🦆', category: 'meat' },
+        { name: '排骨', emoji: '🍖', category: 'meat' },
+
+        // 🐟 海鲜水产
+        { name: '鱼', emoji: '🐟', category: 'seafood' },
+        { name: '虾', emoji: '🍤', category: 'seafood' },
+        { name: '螃蟹', emoji: '🦀', category: 'seafood' },
+        { name: '鱿鱼', emoji: '🦑', category: 'seafood' },
+        { name: '生蚝', emoji: '🦪', category: 'seafood' },
+        { name: '龙虾', emoji: '🦞', category: 'seafood' },
+        { name: '蛤蜊', emoji: '🐚', category: 'seafood' },
+        { name: '扇贝', emoji: '🦪', category: 'seafood' },
+
+        // 🥚 蛋奶豆制品
+        { name: '鸡蛋', emoji: '🥚', category: 'dairy' },
+        { name: '牛奶', emoji: '🥛', category: 'dairy' },
+        { name: '芝士', emoji: '🧀', category: 'dairy' },
+        { name: '黄油', emoji: '🧈', category: 'dairy' },
+        { name: '豆腐', emoji: '🧊', category: 'dairy' },
+        { name: '酸奶', emoji: '🍦', category: 'dairy' },
+
+        // 🍚 主食类
+        { name: '米饭', emoji: '🍚', category: 'staple' },
+        { name: '面条', emoji: '🍜', category: 'staple' },
+        { name: '面包', emoji: '🍞', category: 'staple' },
+        { name: '饺子', emoji: '🥟', category: 'staple' },
+        { name: '意面', emoji: '🍝', category: 'staple' },
+        { name: '馒头', emoji: '🥯', category: 'staple' },
+        { name: '年糕', emoji: '🍘', category: 'staple' },
+
+        // 🍎 水果类
+        { name: '苹果', emoji: '🍎', category: 'fruit' },
+        { name: '香蕉', emoji: '🍌', category: 'fruit' },
+        { name: '柠檬', emoji: '🍋', category: 'fruit' },
+        { name: '菠萝', emoji: '🍍', category: 'fruit' },
+        { name: '草莓', emoji: '🍓', category: 'fruit' },
+        { name: '西瓜', emoji: '🍉', category: 'fruit' },
+        { name: '橙子', emoji: '🍊', category: 'fruit' },
+
+        // 🧂 调味品
+        { name: '盐', emoji: '🧂', category: 'condiment' },
+        { name: '糖', emoji: '🍬', category: 'condiment' },
+        { name: '油', emoji: '🫗', category: 'condiment' },
+        { name: '酱油', emoji: '🍾', category: 'condiment' },
+        { name: '醋', emoji: '🍶', category: 'condiment' },
+        { name: '蜂蜜', emoji: '🍯', category: 'condiment' },
+        { name: '料酒', emoji: '🍶', category: 'condiment' },
+        { name: '胡椒粉', emoji: '🧂', category: 'condiment' }
+      ];
+
+      const values = INGREDIENTS_SEED.map(i => [i.name, i.emoji, i.category]);
+      await pool.query(
+        'INSERT INTO ingredients (name, emoji, category) VALUES ?',
+        [values]
+      );
+      console.log(`Seeded ${values.length} ingredients.`);
+    }
+
   } catch (error) {
     console.error('Database initialization failed:', error);
     process.exit(1);
